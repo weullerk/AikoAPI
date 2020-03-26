@@ -1,0 +1,27 @@
+﻿using AutoMapper;
+using DDD.Models;
+using Infra.Repositories;
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace Infra.Mapper
+{
+    public class PointOfInterestInfraMapping : Profile
+    {
+        public PointOfInterestInfraMapping()
+        {
+            CreateMap<PointOfInterestEntity, PointOfInterest>()
+                .ForMember(d => d.CoordinateX, opt => opt.MapFrom(src => Convert.ToDouble(src.Coordinates.Split(',')[0])))
+                .ForMember(d => d.CoordinateY, opt => opt.MapFrom(src => Convert.ToDouble(src.Coordinates.Split(',')[1])))
+                .ForMember(d => d.ZoomLevel, opt => {
+                    opt.PreCondition(src => src.Coordinates.Split(',').Length == 3);
+                    opt.MapFrom(src => Convert.ToDouble(src.Coordinates.Split(',')[2].TrimEnd('z', 'Z')));
+                });
+
+            CreateMap<PointOfInterest, PointOfInterestEntity>()
+                .ForMember(d => d.Coordinates, opt => opt.MapFrom(src => String.Format("{0},{1},{2}z", src.CoordinateX, src.CoordinateY, src.ZoomLevel)));
+        }
+    }
+}
+ 
