@@ -8,9 +8,11 @@ using AutoMapper;
 using DDD.Interfaces;
 using DDD.Services;
 using FluentValidation;
+using FluentValidation.AspNetCore;
 using Infra.Mapper;
 using Infra.Repositories;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
@@ -38,10 +40,19 @@ namespace API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(o => o.AddPolicy("CorsPolicy", builder =>
+            {
+                builder.AllowAnyOrigin()
+                       .AllowAnyMethod()
+                       .AllowAnyHeader();
+            }));
+
             var connectionString = Configuration["dbConnectionString:localdb"];
             services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionString));
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddMvc()
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
+                .AddFluentValidation();
 
             var mappingConfig = new MapperConfiguration(cfg =>
                 cfg.AddMaps(new[] {
@@ -80,6 +91,8 @@ namespace API
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
+            app.UseCors("CorsPolicy");
 
             app.UseHttpsRedirection();
             app.UseMvc();

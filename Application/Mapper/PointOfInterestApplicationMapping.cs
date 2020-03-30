@@ -15,7 +15,7 @@ namespace Application.Mapper
             CreateMap<PointOfInterestDomainModel, PointOfInterest>().ReverseMap();
 
             CreateMap<PointOfInterest, PointOfInterestViewModel>()
-                .ForMember(d => d.Coordinates, opt => opt.MapFrom(src => String.Format("{0},{1},{2}z", src.CoordinateX, src.CoordinateY, src.ZoomLevel)));
+                .ForMember(d => d.Coordinates, opt => opt.MapFrom(src => String.Format("{0},{1},{2}z", src.CoordinateX.ToString().Replace(',', '.'), src.CoordinateY.ToString().Replace(',', '.'), src.ZoomLevel.ToString().Replace(',', '.'))));
         }
     }
 }

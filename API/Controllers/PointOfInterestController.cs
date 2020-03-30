@@ -78,10 +78,6 @@ namespace Teste_Aiko.Controllers
             {
                 return NotFound(e.Message);
             }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
         }
 
         [HttpDelete("{id}")]
